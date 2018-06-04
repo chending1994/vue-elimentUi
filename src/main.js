@@ -3,12 +3,18 @@
 import Vue from 'vue';
 import App from './App';
 import router from './router';
-
+// 导入element-UI
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-
+// 导入css文件
 import '@/assets/css/index.css';
+// 导入自己myaxios插件
+import MyAxios from '@/plugins/myaxios';
+
+// 全局配置elementUI
 Vue.use(ElementUI);
+// 全局配置myaxios
+Vue.use(MyAxios);
 
 Vue.config.productionTip = false;
 

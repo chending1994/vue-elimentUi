@@ -6,7 +6,7 @@
         <el-input v-model="form.username"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input v-model="form.password"></el-input>
+        <el-input @keyup.enter.native="handleLogin" type="password" v-model="form.password"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button class="login-btn" type="primary" @click.prevent="handleLogin">登 录</el-button>
@@ -26,30 +26,37 @@ export default {
     };
   },
   methods: {
-    handleLogin() {
+    async handleLogin() {
+      const res = await this.$htpp.post('login', this.form);
 
+      const data = res.data;
+      if (data.meta.status === 200) {
+        this.$message.success('登录成功');
+        sessionStorage.setItem('token', data.data.token);
+      } else {
+        this.$message.error('登录失败');
+      }
     }
   }
 };
 </script>
 
-
-<style scoped> 
-  /* scoped 只自作用于当前页面 */
-  .login {
-    background-color: #324152;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .login .login-form {
-    background-color: #fff;
-    width: 400px;
-    padding: 30px;
-    border-radius: 5px;
-  }
-  .login .login-btn {
-    width: 100%;
-  }
+<style scoped>
+/* scoped 只自作用于当前页面 */
+.login {
+  background-color: #324152;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.login .login-form {
+  background-color: #fff;
+  width: 400px;
+  padding: 30px;
+  border-radius: 5px;
+}
+.login .login-btn {
+  width: 100%;
+}
 </style>
