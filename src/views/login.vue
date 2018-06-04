@@ -27,12 +27,16 @@ export default {
   },
   methods: {
     async handleLogin() {
-      const res = await this.$htpp.post('login', this.form);
-
+      const res = await this.$http.post('login', this.form);
+      // 相对于在回调函数中书写代码
       const data = res.data;
       if (data.meta.status === 200) {
         this.$message.success('登录成功');
         sessionStorage.setItem('token', data.data.token);
+        // 跳转
+        this.$router.push({
+          name: 'home'
+        });
       } else {
         this.$message.error('登录失败');
       }
