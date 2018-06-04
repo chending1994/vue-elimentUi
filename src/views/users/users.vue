@@ -8,13 +8,14 @@
     <el-row class="searchContainer">
       <el-col :span="24"><div class="grid-content bg-purple-dark">
         <el-input
+          v-model="searchKey"
           placeholder="请输入内容"
           class="searchInput"
           clearable>
-          <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-button @click="handleSearch" slot="append" icon="el-icon-search"></el-button>
         </el-input>
 
-        <el-button type="success" plain>添加用户</el-button>
+        <el-button @click="handleSearch" type="success" plain>添加用户</el-button>
       </div></el-col>
     </el-row>
     <!-- 表格 -->
@@ -105,7 +106,8 @@ export default {
       tableData: [],
       pagenum: 1,
       pagesize: 4,
-      total: 0
+      total: 0,
+      searchKey: ''
     };
   },
   created() {
@@ -113,6 +115,11 @@ export default {
     this.loadData();
   },
   methods: {
+    // 搜索功能
+    handleSearch() {
+      this.pagenum = 1;
+      this.loadData();
+    },
     // 分页使用的方法
     handleSizeChange(val) {
         // 当界面上选择每页条数数据后执行
@@ -133,7 +140,7 @@ export default {
       this.$http.defaults.headers.common['Authorization'] = token;
       // 发送请求
     //   const res = await this.$http.get('users?pagenum=1&pagesize=10');
-      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
+      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchKey}`);
       // 获取服务器返回的数据
       const data = res.data;
       if (data.meta.status === 200) {
