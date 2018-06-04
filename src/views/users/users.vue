@@ -86,6 +86,15 @@
         </template>
       </el-table-column>
      </el-table>
+     <el-pagination 
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[2,4,6]"
+        :page-size="pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+     </el-pagination>
   </el-card>
 </template>
 
@@ -93,7 +102,10 @@
 export default {
   data() {
     return {
-      tableData: []
+      tableData: [],
+      pagenum: 1,
+      pagesize: 4,
+      total: 0
     };
   },
   created() {
@@ -101,16 +113,31 @@ export default {
     this.loadData();
   },
   methods: {
+    // 分页使用的方法
+    handleSizeChange(val) {
+        // 当界面上选择每页条数数据后执行
+        this.pagesize = val;
+        this.pagenum = 1;
+        this.loadData();
+    },
+    handleCurrentChange(val) {
+        // 当页码发送变化的时候执行
+        // 修改当前页面，重新获取数据列表
+        this.pagenum = val;
+        this.loadData();
+    },
     async loadData() {
       // 获取登录后的token
       const token = sessionStorage.getItem('token');
       // axios发送请求的时候需要携带token
       this.$http.defaults.headers.common['Authorization'] = token;
       // 发送请求
-      const res = await this.$http.get('users?pagenum=1&pagesize=10');
+    //   const res = await this.$http.get('users?pagenum=1&pagesize=10');
+      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
       // 获取服务器返回的数据
       const data = res.data;
       if (data.meta.status === 200) {
+        this.total = data.data.total;
         this.tableData = data.data.users;
       } else {
         this.$message.error('获取数据失败');
