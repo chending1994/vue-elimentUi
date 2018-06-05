@@ -3,7 +3,7 @@
     <el-header class="header">
       <el-row>
         <el-col :span="4"><div class="grid-content bg-purple">
-          <img src="/static/logo.png" alt="">
+          <img src="/static/logo1.svg" alt="">
         </div></el-col>
         <el-col :span="16"><div class="grid-content bg-purple">
           <div class="title">电商后台管理</div>
@@ -102,7 +102,7 @@ export default {
     // 判断sessionStorage中是否有token ，如果没有token认为没有登录
     const token = sessionStorage.getItem('token');
     if (!token) {
-      // 跳转会登录页面并且要提示
+      // 跳转回登录页面并且要提示
       this.$router.push({
         name: 'login'
       });
