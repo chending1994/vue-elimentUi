@@ -20,6 +20,7 @@
     </el-row>
     <!-- 表格 -->
      <el-table
+      v-loading="loading"
       stripe
       border
       :data="tableData"
@@ -144,7 +145,8 @@ export default {
         password: '',
         email: '',
         mobile: ''
-      }
+      },
+      loading: true
     };
   },
   created() {
@@ -212,6 +214,7 @@ export default {
       this.loadData();
     },
     async loadData() {
+      this.loading = true;
       // 获取登录后的token
       const token = sessionStorage.getItem('token');
       // axios发送请求的时候需要携带token
@@ -223,6 +226,9 @@ export default {
           this.searchKey
         }`
       );
+      setTimeout(() => {
+        this.loading = false
+      },1000)
       // 获取服务器返回的数据
       const data = res.data;
       if (data.meta.status === 200) {
