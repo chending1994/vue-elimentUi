@@ -121,7 +121,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addUserDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addUserDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="handleAdd">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -152,6 +152,22 @@ export default {
     this.loadData();
   },
   methods: {
+    async handleAdd() {
+      const { data } = await this.$http.post('users',this.userFormData);
+      if(data.meta.status === 201) {
+        // 添加成功
+        this.$message.success('添加成功');
+        this.loadData();
+        // 关闭对话框
+        this.addUserDialogVisible = false;
+        // 清空文本框中的值
+        for(let key in this.userFormData) {
+          this.userFormData[key] = '';
+        }
+      }else {
+        this.$message.error(data.meta.msg);
+      }
+    },
     async handleDel(user) {
       if (this.$confirm('确认删除此用户?')) {
         return;
