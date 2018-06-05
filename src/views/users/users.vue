@@ -75,7 +75,7 @@
             plain>
           </el-button>
           <el-button
-            @click="handleDel(scope.row)"
+            @click="handleDel(scope.row.id)"
             size="mini"
             type="danger"
             icon="el-icon-delete"
@@ -104,13 +104,15 @@
       title="添加用户"
       :visible.sync="addUserDialogVisible">
       <el-form
+        ref="addUserForm"
+        :rules="rules"
         label-width="100px"
         label-position="right"
         :model="userFormData">
-        <el-form-item label="用户名">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="userFormData.username" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input type="password" v-model="userFormData.password" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="邮箱">
@@ -146,7 +148,18 @@ export default {
         email: '',
         mobile: ''
       },
-      loading: true
+      // 控制加载提示显示隐藏
+      loading: true,
+      rules: {
+        username: [
+          { require: true, message: '请输入用户名', trigger: 'blur' },
+          { min:3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur'}
+        ],
+        password: [
+          { require: true, message: '请输入密码', trigger: 'blur' },
+          { min:5, max: 11, message: '长度在 5 到 11 个字符', trigger: 'blur'}
+        ]
+      }
     };
   },
   created() {
@@ -170,17 +183,26 @@ export default {
         this.$message.error(data.meta.msg);
       }
     },
-    async handleDel(user) {
-      if (this.$confirm('确认删除此用户?')) {
-        return;
-      }
-      const res = await this.$http.delete(`users/${user.id}`);
-      const data = res.data;
-      if (data.meta.status === 200) {
-        this.$message.success('删除成功');
-      } else {
-        this.$message.error('删除失败');
-      }
+    // 根据id删除用户
+    async handleDel(id) {
+      this.$confirm('是否确定删除该用户?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          // 删除操作
+          const { data } = await this.$http.delete(`users/${id}`);
+          if (data.meta.status === 200) {
+            // 删除成功
+            this.$message.success('删除成功');
+            this.pagenum = 1;
+            // 重新加载数据
+            this.loadData();
+          } else {
+            // 删除失败
+            this.$message.error(data.meta.msg);
+          }
+        });
     },
     // 开个状态改变
     async handleChange(user) {
