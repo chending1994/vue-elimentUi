@@ -159,12 +159,18 @@
         <el-form-item label="请选择角色">
           <el-select v-model="selectedUser.rid">
             <el-option label="请选择" :value="-1"></el-option>
+            <el-option
+              v-for="option in options"
+              :key="option.id"
+              :label="option.roleName"
+              :value="option.id">
+            </el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="setRoleDialogVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button type="primary" @click="handleSetRole">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -206,7 +212,8 @@ export default {
       selectedUser: {
         username: '',
         rid: -1
-      }
+      },
+      options: []
     };
   },
   created() {
@@ -214,13 +221,37 @@ export default {
     this.loadData();
   },
   methods: {
-    // 修改分配权限
-    handleOpenSetRoleDialog(user) {
+    // 分配权限
+    async handleSetRole() {
+      const {data } = await this.$http.put(`users/${this.selectedUser.id}/role`,{
+        rid: this.selectedUser.rid
+      });
+      console.log(data);
+      if (data.meta.status === 200 ) {
+        this.setRoleDialogVisible = false;
+        this.$message.success('权限分配成功');
+      }else {
+        this.$message.error('权限分配失败');
+      }
+    },
+    // 打开分配权限的对话框
+    async handleOpenSetRoleDialog(user) {
       this.setRoleDialogVisible = true;
+      // 记录用户id,分配权限的时候使用
+      this.selectedUser.id = user.id;
       this.selectedUser.username = user.username;
+      // 发送请求，获取所有的角色
+      const { data } = await this.$http.get('roles');
+      this.options = data.data;
+      // console.log(this.options);
+      // 根据用户的id去请求用户对象，目的是取得角色id
+      const res = await this.$http.get(`users/${user.id}`);
+      const data1 = res.data;
+      this.selectedUser.rid = data1.data.rid;
     },
     // 修改用户
     async handleUpdate() {
+      // console.log(this.userFormData);
       const { data } = await this.$http.put(`users/${this.userFormData.id}`,{
         email: this.userFormData.email,
         mobile: this.userFormData.mobile
@@ -236,7 +267,10 @@ export default {
     // 点击编辑按钮，打开修改用户的对话框，并且把当前用户信息显示
     handleOpenEditDialog(user) {
       this.editUserDialogVisible = true;
-      this.userFormData = user;
+      this.userFormData.id = user.id;
+      this.userFormData.username = user.username;
+      this.userFormData.mobile = user.mobile;
+      this.userFormData.email = user.email;
       console.log(this.userFormData);
     },
     async handleAdd() {
