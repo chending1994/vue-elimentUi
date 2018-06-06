@@ -83,6 +83,7 @@
             plain>
           </el-button>
           <el-button
+            @click="handleOpenSetRoleDialog(scope.row)"
             type="success"
             icon="el-icon-check"
             size="mini"
@@ -145,9 +146,27 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button>取 消</el-button>
+        <el-button type="primary" @click="handleUpdate">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="setRoleDialogVisible">
+      <el-form
+      label-width="100px">
+        <el-form-item label="用户名">
+          {{ selectedUser.username }}
+        </el-form-item>
+        <el-form-item label="请选择角色">
+          <el-select v-model="selectedUser.rid">
+            <el-option label="请选择" :value="-1"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
         <el-button type="primary">确 定</el-button>
       </div>
-</el-dialog>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -182,7 +201,12 @@ export default {
         ]
       },
       // 控制编辑窗口显示隐藏
-      editUserDialogVisible: false
+      editUserDialogVisible: false,
+      setRoleDialogVisible: false,
+      selectedUser: {
+        username: '',
+        rid: -1
+      }
     };
   },
   created() {
@@ -190,6 +214,25 @@ export default {
     this.loadData();
   },
   methods: {
+    // 修改分配权限
+    handleOpenSetRoleDialog(user) {
+      this.setRoleDialogVisible = true;
+      this.selectedUser.username = user.username;
+    },
+    // 修改用户
+    async handleUpdate() {
+      const { data } = await this.$http.put(`users/${this.userFormData.id}`,{
+        email: this.userFormData.email,
+        mobile: this.userFormData.mobile
+      });
+      if(data.meta.status === 200) {
+        this.$message.success('修改成功');
+        this.loadData();
+        this.editUserDialogVisible = false;
+      }else{
+        this.$message.error(data.meta.msg);
+      }
+    },
     // 点击编辑按钮，打开修改用户的对话框，并且把当前用户信息显示
     handleOpenEditDialog(user) {
       this.editUserDialogVisible = true;
