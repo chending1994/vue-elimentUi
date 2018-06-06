@@ -134,13 +134,13 @@
       label-width="100px"
       :model="userFormData">
         <el-form-item label="用户名">
-          <el-input v-model="userFormData.name" auto-complete="off"></el-input>
+          <el-input v-model="userFormData.username" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="邮箱">
-          <el-input v-model="userFormData.name" auto-complete="off"></el-input>
+          <el-input v-model="userFormData.email" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="userFormData.name" auto-complete="off"></el-input>
+          <el-input v-model="userFormData.mobile" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -233,7 +233,7 @@ export default {
         }
       });
     },
-    // 开个状态改变
+    // 开关状态改变
     async handleChange(user) {
       // loadData的时候，已经给this.$http设置了请求头，携带了token
       const res = await this.$http.put(
