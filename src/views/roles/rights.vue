@@ -52,7 +52,12 @@ export default {
   methods: {
     async loadData() {
       const { data } = await this.$http.get('rights/list');
-      this.tableData = data.data;
+      // this.tableData = data.data;
+      if (data.meta.status === 200) {
+        this.tableData = data.data;
+      } else {
+        this.$message.error(data.meta.msg);
+      }
     }
   }
 };

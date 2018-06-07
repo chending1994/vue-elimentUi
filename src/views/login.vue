@@ -38,7 +38,7 @@ export default {
           name: 'home'
         });
       } else {
-        this.$message.error('登录失败');
+        this.$message.error(data.meta.msg);
       }
     }
   }
