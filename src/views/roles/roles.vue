@@ -113,6 +113,7 @@
     <!-- 分配权限的对话框 -->
     <el-dialog title="分配权限" :visible.sync="setRightsDialogVisible">
       <el-tree
+        ref="tree"
         default-expand-all
         show-checkbox
         :data="treeData"
@@ -122,7 +123,7 @@
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="setRightsDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="setRightsDialogVisible = false">确定</el-button>
+        <el-button type="primary" @click="handleSetRights">确定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -140,7 +141,8 @@ export default {
         children: 'children',
         label: 'authName'
       },
-      checkedKeys: []
+      checkedKeys: [],
+      currentRoleId: -1
     };
   },
   created() {
@@ -169,29 +171,69 @@ export default {
       }
     },
     async handleShowSetRightsDialog(role) {
+      // 获取当前角色的id，分配权限的时候使用
+      this.currentRoleId = role.id;
+
       this.setRightsDialogVisible = true;
       // 获取tree的数据
       const { data: resData } = await this.$http.get('rights/tree');
       const { data } = resData;
       this.treeData = data;
-      var arr = [];
-      role.children.forEach((item1) => {
-        // item1 一级权限对象
-        arr.push(item1.id);
-
-        // 遍历二级权限
-        item1.children.forEach((item2) => {
-          arr.push(item2.id);
-          // item2 二级权限
-
-          // 遍历三级权限
-          item2.children.forEach((item3) => {
-            // item3 三级权限
-            arr.push(item3.id);
+      // 获取当前角色的所有权限  role.children
+      function getCheckedKeys(children) {
+        const arr = [];
+        (function fn(list) {
+          list.forEach((item) => {
+            arr.push(item.id);
+            // 递归调用
+            if (item.children) {
+              fn(item.children);
+            }
           });
-        });
+        })(children);
+        return arr;
+      }
+      this.checkedKeys = getCheckedKeys(role.children);
+      console.log(this.checkedKeys);
+      // var arr = [];
+      // role.children.forEach((item1) => {
+      //   // item1 一级权限对象
+      //   arr.push(item1.id);
+
+      //   // 遍历二级权限
+      //   item1.children.forEach((item2) => {
+      //     arr.push(item2.id);
+      //     // item2 二级权限
+
+      //     // 遍历三级权限
+      //     item2.children.forEach((item3) => {
+      //       // item3 三级权限
+      //       arr.push(item3.id);
+      //     });
+      //   });
+      // });
+      // this.checkedKeys = arr;
+    },
+    async handleSetRights() {
+      // 调用tree内部封装的方法
+      const arr1 = this.$refs.tree.getCheckedKeys();
+      const arr2 = this.$refs.tree.getHalfCheckedKeys();
+      // console.log(arr1, arr2);
+      const rightsIds = arr1.concat(arr2).join(',');
+      console.log(rightsIds);
+      // 发送请求
+      const { data: resData } = await this.$http.post(`roles/${this.currentRoleId}/rights`, {
+        rids: rightsIds
       });
-      this.checkedKeys = arr;
+
+      if (resData.meta.status === 200) {
+        this.$message.success('分配权限成功');
+        this.setRightsDialogVisible = false;
+        // 刷新
+        this.loadData();
+      } else {
+        this.$message.error(resData.meta.msg);
+      }
     }
   }
 };
