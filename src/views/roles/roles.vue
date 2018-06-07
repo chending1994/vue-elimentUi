@@ -13,6 +13,7 @@
     </el-row>
 
     <el-table
+      height="500"
       :data="tableData"
       v-loading="loading"
       stripe
@@ -28,6 +29,7 @@
             <el-col :span="4">
               <!-- 显示一级权限名称 -->
               <el-tag
+                @close="handleClose(scope.row,item)"
                 type="success"
                 closable>
                 {{ item.authName }}
@@ -41,6 +43,7 @@
                 <!-- 显示二级权限 -->
                 <el-col :span="4">
                   <el-tag
+                    @close="handleClose(scope.row,item1)"
                     type="info"
                     closable>
                     {{ item1.authName }}
@@ -49,6 +52,7 @@
                 <!-- 显示三级权限 -->
                 <el-col :span="20">
                     <el-tag
+                      @close="handleClose(scope.row,item2)"
                       class="level3"
                       v-for="item2 in item1.children"
                       :key="item2.id"
@@ -58,6 +62,11 @@
                     </el-tag>
                 </el-col>
               </el-row>
+            </el-col>
+          </el-row>
+          <el-row v-if="scope.row.children.length === 0">
+            <el-col :span="24">
+              当前角色没有分配权限
             </el-col>
           </el-row>
         </template>
