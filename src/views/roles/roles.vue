@@ -101,6 +101,7 @@
             plain>
           </el-button>
           <el-button
+            @click="handleShowSetRightsDialog"
             type="success"
             icon="el-icon-check"
             size="mini"
@@ -109,6 +110,19 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分配权限的对话框 -->
+    <el-dialog title="分配权限" :visible.sync="setRightsDialogVisible">
+      <el-tree
+        default-expand-all
+        show-checkbox
+        :data="treeData"
+        :props="defaultProps">
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRightsDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="setRightsDialogVisible = false">确定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -117,7 +131,13 @@ export default {
   data() {
     return {
       tableData: [],
-      loading: true
+      loading: true,
+      setRightsDialogVisible: false,
+      treeData:[],
+      defaultProps: {
+        children: 'children',
+        label: 'authName'
+      }
     };
   },
   created() {
@@ -144,6 +164,13 @@ export default {
       } else {
         this.$message.error(meta.msg);
       }
+    },
+    async handleShowSetRightsDialog() {
+      this.setRightsDialogVisible = true;
+      // 获取tree的数据
+      const { data: resData } = await this.$http.get('rights/tree');
+      const { data } = resData;
+      this.treeData = data;
     }
   }
 };
