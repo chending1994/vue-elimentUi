@@ -134,6 +134,16 @@ export default {
       } else {
         this.$message.error(meta.msg);
       }
+    },
+    // 删除对应的权限
+    async handleClose(role, rights) {
+      const { data: resData } = await this.$http.delete(`roles/${role.id}/rights/${rights.id}`);
+      const { data: meta } = resData;
+      if (meta.status === 200) {
+        this.$message.succes('删除成功');
+      } else {
+        this.$message.error(meta.msg);
+      }
     }
   }
 };
