@@ -14,20 +14,65 @@
 
     <el-table
       :data="tableData"
+      v-loading="loading"
       stripe
       border
       style="width: 100%">
+      <el-table-column type="expand">
+        <template slot-scope="scope">
+          <!-- 展示之后，显示一级权限 -->
+          <el-row
+            class="level1"
+            v-for="item in scope.row.children"
+            :key="item.id">
+            <el-col :span="4">
+              <!-- 显示一级权限名称 -->
+              <el-tag
+                type="success"
+                closable>
+                {{ item.authName }}
+              </el-tag>
+            </el-col>
+            <el-col :span="20">
+              <!-- 显示二、三级权限 -->
+              <el-row
+                v-for="item1 in item.children"
+                :key="item1.id">
+                <!-- 显示二级权限 -->
+                <el-col :span="4">
+                  <el-tag
+                    type="info"
+                    closable>
+                    {{ item1.authName }}
+                  </el-tag>
+                </el-col>
+                <!-- 显示三级权限 -->
+                <el-col :span="20">
+                    <el-tag
+                      class="level3"
+                      v-for="item2 in item1.children"
+                      :key="item2.id"
+                      closable
+                      type="warning">
+                        {{ item2.authName }}
+                    </el-tag>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+        </template>
+      </el-table-column>
       <el-table-column
         type="index"
         width="40">
       </el-table-column>
       <el-table-column
-        prop="authName"
+        prop="roleName"
         label="角色名称"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="path"
+        prop="roleDesc"
         label="角色描述"
         width="180">
       </el-table-column>
@@ -62,8 +107,25 @@
 export default {
   data() {
     return {
-      tableData: []
+      tableData: [],
+      loading: true
     };
+  },
+  created() {
+    this.loadData();
+  },
+  methods: {
+    async loadData() {
+      const { data: resData } = await this.$http.get('roles');
+      const { data, meta } = resData;
+
+      this.loading = false;
+      if (meta.status === 200) {
+        this.tableData = data;
+      } else {
+        this.$message.error(meta.msg);
+      }
+    }
   }
 };
 </script>
@@ -72,5 +134,12 @@ export default {
 .row {
   margin-top: 15px;
   margin-bottom: 15px;
+}
+.level1 {
+  margin-bottom: 15px;
+}
+.level3 {
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 </style>
