@@ -12,6 +12,11 @@ import '@/assets/css/index.css';
 import MyAxios from '@/plugins/myaxios';
 // 导入moment
 import moment from 'moment';
+// 导入自己封装的面包屑组件
+import MyBreadcrumb from '@/components/mybreadcrumb';
+
+// 全局组件
+Vue.component(MyBreadcrumb.name, MyBreadcrumb);
 // 全局配置elementUI
 Vue.use(ElementUI);
 // 全局配置myaxios
