@@ -9,7 +9,9 @@
     </el-row>
 
     <el-table
-      height="500"
+      border
+      stripe
+      height="400"
       :data="tableData"
       style="width: 100%">
       <el-tree-grid
@@ -28,14 +30,14 @@
             <span v-if="scope.row.cat_level === 0">一级</span>
             <span v-else-if="scope.row.cat_level === 1">二级</span>
             <span v-else-if="scope.row.cat_level === 2">三级</span>
-        </template>    
+        </template>
       </el-table-column>
       <el-table-column
         prop="cat_deleted"
         label="是否有效">
         <template slot-scope="scope">
             <span>{{ scope.row.cat_deleted ? '无效' : '有效' }}</span>
-        </template>    
+        </template>
       </el-table-column>
       <el-table-column
         label="操作">
@@ -55,6 +57,17 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-pagination
+      class="pagination"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[8, 10, 20, 30]"
+      :page-size="pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -64,18 +77,33 @@ import ElTreeGrid from "element-tree-grid";
 export default {
   data() {
     return {
-      tableData: []
+      tableData: [],
+      pagenum: 1,
+      pagesize: 8,
+      total: 0
     };
   },
   created() {
     this.loadData();
   },
   methods: {
+    handleSizeChange(val) {
+      this.pagesize = val;
+      this.pagenum = 1;
+      this.loadData();
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.pagenum = val;
+      this.loadData();
+      console.log(`当前页: ${val}`);
+    },
     async loadData() {
       const { data: resData } = await this.$http.get(
-        "categories?type=3&pagenum=1&pagesize=10"
+        `categories?type=3&pagenum=${this.pagenum}&pagesize=${this.pagesize}`
       );
       this.tableData = resData.data.result;
+      this.total = resData.data.total;
     }
   },
   components: {
@@ -88,5 +116,9 @@ export default {
 .row {
   margin-top: 15px;
   margin-bottom: 15px;
+}
+
+.pagination {
+  margin-top: 15px;
 }
 </style>
