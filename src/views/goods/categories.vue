@@ -4,11 +4,12 @@
 
     <el-row class="row">
       <el-col :span="24">
-        <el-button type="success" plain>添加分类</el-button>
+        <el-button type="success" @click="handleShowAddDialog" plain>添加分类</el-button>
       </el-col>
     </el-row>
 
     <el-table
+      v-loading="loading"
       border
       stripe
       height="400"
@@ -68,6 +69,30 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+
+    <!-- 添加分类的对话框 -->
+    <el-dialog title="添加商品分类" :visible.sync="addDialogFormVisible">
+      <el-form label-width="100" :model="form" label-position="right">
+        <el-form-item label="分类名称">
+          <el-input style="width: 300px" v-model="form.cat_name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-cascader
+            placeholder="默认添加一级分类"
+            change-on-select
+            clearable
+            expand-trigger="hover"
+            :options="options"
+            :props="defaultProps"
+            v-model="selectedOptions">
+          </el-cascader>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -80,13 +105,59 @@ export default {
       tableData: [],
       pagenum: 1,
       pagesize: 8,
-      total: 0
+      total: 0,
+      loading: true,
+      // 控制新增对话框的显示或者隐藏
+      addDialogFormVisible: false,
+      form: {
+          cat_pid: -1,
+          cate_name: '',
+          cat_level: 0
+      },
+      // 绑定层级下拉框
+      selectedOptions: [],
+      // 层级下拉框中的数据
+      options: [],
+      // 层级下拉框的配置
+      defaultProps: {
+          value: 'cat_id',
+          label: 'cat_name',
+          children: 'children'
+      }
     };
   },
   created() {
     this.loadData();
   },
   methods: {
+    // 添加分类
+    async handleAdd() {
+      if (this.selectedOptions.length === 0) {
+          this.form.cate_pid = 0;
+      } else if (this.selectedOptions.length === 1) {
+          this.form.cat_pid = this.selectedOptions[0];
+      } else if (this.selectedOptions.length === 2) {
+          this.form.cat_pid = this.selectedOptions[1];
+      }
+      this.form.cat_level = this.selectedOptions.length;
+
+      // 发送请求，添加数据
+      const { data: resData } = await this.$http.post('categories',this.form);
+      if (resData.meta.status === 201) {
+          this.$message.success('添加成功');
+          this.loadData();
+          this.addDialogFormVisible = false;
+      }else {
+          this.$message.error(resData.meta.msg);
+      }
+    },
+    // 点击添加按钮，显示添加对话框
+    async handleShowAddDialog() {
+        this.addDialogFormVisible = true;
+        // 加载层级的数据
+        const { data: resData } = await this.$http.get('categories?type=2');
+        this.options = resData.data;
+    },
     handleSizeChange(val) {
       this.pagesize = val;
       this.pagenum = 1;
@@ -102,6 +173,7 @@ export default {
       const { data: resData } = await this.$http.get(
         `categories?type=3&pagenum=${this.pagenum}&pagesize=${this.pagesize}`
       );
+      this.loading = false;
       this.tableData = resData.data.result;
       this.total = resData.data.total;
     }
