@@ -77,7 +77,16 @@
                 <el-input v-model="item.attr_vals"></el-input>
               </el-form-item>
             </el-tab-pane>
-            <el-tab-pane name="3" label="商品图片">商品图片</el-tab-pane>
+            <el-tab-pane name="3" label="商品图片">
+              <el-upload
+                action="http://127.0.0.1:8888/api/private/v1/upload"
+                :on-remove="handleRemove"
+                :on-success="handleSuccess"
+                :headers="tokenHeader"
+                list-type="picture">
+                <el-button size="small" type="primary">点击上传</el-button>
+              </el-upload>
+            </el-tab-pane>
             <el-tab-pane name="4" label="商品内容">商品内容</el-tab-pane>
         </el-tabs>
       </el-form>
@@ -94,7 +103,8 @@ export default {
         goods_price: '',
         goods_number: '',
         goods_weight: '',
-        goods_cat: ''
+        goods_cat: '',
+        pics: []
       },
       options: [],
       defaultProps: {
@@ -108,13 +118,41 @@ export default {
       // 动态参数
       dynamicsParams: [],
       // 静态参数
-      staticParams: []
+      staticParams: [],
+      // 上传文件的手，设置请求头
+      tokenHeader: {
+        'Authorization': sessionStorage.getItem('token')
+      }
     };
   },
   created() {
     this.loadOptions();
   },
   methods: {
+    // 图片上传事件
+    // 移除一个图片
+    handleRemove(file) {
+      // file.response服务器返回的响应
+      // file.response.data.tmp_path
+      // 根据file中的tmp_path的路径，找到数组中对应的要删除的对象的索引
+      const index = this.form.pics.findIndex((item) => {
+        return item.pic === file.response.data.tmp_path;
+      });
+      this.form.pics.splice(index,1);
+    },
+    // 图片上传成功
+    handleSuccess(response) {
+      const { meta, data } = response;
+      if (meta.status === 200) {
+        this.$message.success('图片上传成功');
+        // 当上传成功
+        this.form.pics.push({
+          pic: data.tmp_path
+        });
+      } else {
+        this.$message.error(meta.msg);
+      }
+    },
     // 点击tab栏执行
     async handleTabClick() {
       if (this.active === '1' || this.active === '2') {
