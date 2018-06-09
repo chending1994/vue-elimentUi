@@ -13,6 +13,8 @@ import Roles from '@/views/roles/roles';
 
 // 商品分类组件
 import Categories from '@/views/goods/categories';
+// 商品列表组件
+import Goods from '@/views/goods/goodsList';
 
 // 导入element-ui中的Message方法
 import { Message } from 'element-ui';
@@ -45,6 +47,11 @@ const router = new Router({
           name: 'categories',
           path: 'categories',
           component: Categories
+        },
+        {
+          name: 'goods',
+          path: 'goods',
+          component: Goods
         }
       ]
     }
