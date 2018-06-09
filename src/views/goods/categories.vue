@@ -50,6 +50,7 @@
             plain>
         </el-button>
         <el-button
+            @click="handleDel(scope.row.cat_id)"
             size="mini"
             type="danger"
             icon="el-icon-delete"
@@ -98,7 +99,7 @@
 
 <script>
 // 导入tree-column组件
-import ElTreeGrid from "element-tree-grid";
+import ElTreeGrid from 'element-tree-grid';
 export default {
   data() {
     return {
@@ -110,9 +111,9 @@ export default {
       // 控制新增对话框的显示或者隐藏
       addDialogFormVisible: false,
       form: {
-          cat_pid: -1,
-          cate_name: '',
-          cat_level: 0
+        cat_pid: -1,
+        cate_name: '',
+        cat_level: 0
       },
       // 绑定层级下拉框
       selectedOptions: [],
@@ -120,9 +121,9 @@ export default {
       options: [],
       // 层级下拉框的配置
       defaultProps: {
-          value: 'cat_id',
-          label: 'cat_name',
-          children: 'children'
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children'
       }
     };
   },
@@ -130,33 +131,54 @@ export default {
     this.loadData();
   },
   methods: {
+    // 删除分类
+    async handleDel(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(async () => {
+        const { data: resData } = await this.$http.delete(`categories/${id}`);
+        // console.log(resData);
+        if (resData.meta.status === 200) {
+          this.$message.success(resData.meta.msg);
+          this.loadData();
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
     // 添加分类
     async handleAdd() {
       if (this.selectedOptions.length === 0) {
-          this.form.cate_pid = 0;
+        this.form.cate_pid = 0;
       } else if (this.selectedOptions.length === 1) {
-          this.form.cat_pid = this.selectedOptions[0];
+        this.form.cat_pid = this.selectedOptions[0];
       } else if (this.selectedOptions.length === 2) {
-          this.form.cat_pid = this.selectedOptions[1];
+        this.form.cat_pid = this.selectedOptions[1];
       }
       this.form.cat_level = this.selectedOptions.length;
 
       // 发送请求，添加数据
-      const { data: resData } = await this.$http.post('categories',this.form);
+      const { data: resData } = await this.$http.post('categories', this.form);
       if (resData.meta.status === 201) {
-          this.$message.success('添加成功');
-          this.loadData();
-          this.addDialogFormVisible = false;
-      }else {
-          this.$message.error(resData.meta.msg);
+        this.$message.success('添加成功');
+        this.loadData();
+        this.addDialogFormVisible = false;
+      } else {
+        this.$message.error(resData.meta.msg);
       }
     },
     // 点击添加按钮，显示添加对话框
     async handleShowAddDialog() {
-        this.addDialogFormVisible = true;
-        // 加载层级的数据
-        const { data: resData } = await this.$http.get('categories?type=2');
-        this.options = resData.data;
+      this.addDialogFormVisible = true;
+      // 加载层级的数据
+      const { data: resData } = await this.$http.get('categories?type=2');
+      this.options = resData.data;
     },
     handleSizeChange(val) {
       this.pagesize = val;
@@ -179,7 +201,7 @@ export default {
     }
   },
   components: {
-    "el-tree-grid": ElTreeGrid
+    'el-tree-grid': ElTreeGrid
   }
 };
 </script>
