@@ -138,7 +138,7 @@ export default {
       const index = this.form.pics.findIndex((item) => {
         return item.pic === file.response.data.tmp_path;
       });
-      this.form.pics.splice(index,1);
+      this.form.pics.splice(index, 1);
     },
     // 图片上传成功
     handleSuccess(response) {
