@@ -27,21 +27,22 @@
         :model="form"
         label-width="100px">
         <el-tabs
+          @tab-click="handleTabClick"
           v-model="active"
           class="tabs"
           tab-position="left">
             <el-tab-pane name="0" label="基本信息">
               <el-form-item label="商品名称">
-                <el-input></el-input>
+                <el-input v-model="form.goods_name"></el-input>
               </el-form-item>
               <el-form-item label="商品价格">
-                <el-input></el-input>
+                <el-input v-model="form.goods_price"></el-input>
               </el-form-item>
               <el-form-item label="商品重量">
-                <el-input></el-input>
+                <el-input v-model="form.goods_weight"></el-input>
               </el-form-item>
               <el-form-item label="商品数量">
-                <el-input></el-input>
+                <el-input v-model="form.goods_number"></el-input>
               </el-form-item>
               <el-form-item label="商品分类">
                 <el-cascader
@@ -54,7 +55,13 @@
                 </el-cascader>
               </el-form-item>
             </el-tab-pane>
-            <el-tab-pane name="1" label="商品参数">商品参数</el-tab-pane>
+            <el-tab-pane name="1" label="商品参数">
+              <el-form-item label="内存">
+                <el-checkbox border label="复选框A"></el-checkbox> 
+                <el-checkbox border label="复选框B"></el-checkbox> 
+                <el-checkbox border label="复选框C"></el-checkbox> 
+              </el-form-item>
+            </el-tab-pane>
             <el-tab-pane name="2" label="商品属性">商品属性</el-tab-pane>
             <el-tab-pane name="3" label="商品图片">商品图片</el-tab-pane>
             <el-tab-pane name="4" label="商品内容">商品内容</el-tab-pane>
@@ -68,7 +75,13 @@ export default {
   data() {
     return {
       active: '0',
-      form: {},
+      form: {
+        goods_name: '',
+        goods_price: '',
+        goods_number: '',
+        goods_weight: '',
+        goods_cat: '',
+      },
       options: [],
       defaultProps: {
         value: 'cat_id',
@@ -76,13 +89,35 @@ export default {
         children: 'children'
       },
       // 绑定到层级下拉框上的数据
-      selectedOptions: []
+      selectedOptions: [],
+      checkList: [],
+      // 动态参数
+      dynamicsParams: [],
+      // 静态参数
+      staticParams: []
     };
   },
   created() {
     this.loadOptions();
   },
   methods: {
+    // 点击tab栏执行
+    async handleTabClick() {
+      if (this.active === '1' || this.active === '2') {
+        if (this.selectedOptions.length !==3 ) {
+          this.$message.error('请选择三级分类');
+          return;
+        }
+      }
+      // 如果选择了三级分类，发送请求获取数据
+      // 请求的接口地址中的id，是三级分类的id
+      const { data: resData } = await this.$http.get(`categories/${this.selectedOptions[2]}/attributes?sel=many`)
+      // 获取动态数据库，需要对数据进行处理，要把分割的数据转化成数组
+      this.dynamicsParams = resData.data;
+      this.dynamicsParams.forEach((item) => {
+        item.attr_vals = item.attr_vals.trim().length === 0 ? [] : item.attr_vals.trim().split(',');
+      });
+    },
     handleChange() {
       // 判断当前是否选中的是三级分类
       // 如果不是三级分类，提示，并清空
