@@ -56,10 +56,17 @@
               </el-form-item>
             </el-tab-pane>
             <el-tab-pane name="1" label="商品参数">
-              <el-form-item label="内存">
-                <el-checkbox border label="复选框A"></el-checkbox> 
-                <el-checkbox border label="复选框B"></el-checkbox> 
-                <el-checkbox border label="复选框C"></el-checkbox> 
+              <el-form-item
+                v-for="item in dynamicsParams"
+                :key="item.attr_id"
+                :label="item.attr_name">
+                <el-checkbox-group v-model="item.attr_vals">
+                  <el-checkbox
+                   v-for="val in item.attr_vals"
+                   :key="val"
+                   border
+                   :label="val"></el-checkbox>
+                </el-checkbox-group>
               </el-form-item>
             </el-tab-pane>
             <el-tab-pane name="2" label="商品属性">商品属性</el-tab-pane>
@@ -80,7 +87,7 @@ export default {
         goods_price: '',
         goods_number: '',
         goods_weight: '',
-        goods_cat: '',
+        goods_cat: ''
       },
       options: [],
       defaultProps: {
@@ -104,14 +111,14 @@ export default {
     // 点击tab栏执行
     async handleTabClick() {
       if (this.active === '1' || this.active === '2') {
-        if (this.selectedOptions.length !==3 ) {
+        if (this.selectedOptions.length !== 3) {
           this.$message.error('请选择三级分类');
           return;
         }
       }
       // 如果选择了三级分类，发送请求获取数据
       // 请求的接口地址中的id，是三级分类的id
-      const { data: resData } = await this.$http.get(`categories/${this.selectedOptions[2]}/attributes?sel=many`)
+      const { data: resData } = await this.$http.get(`categories/${this.selectedOptions[2]}/attributes?sel=many`);
       // 获取动态数据库，需要对数据进行处理，要把分割的数据转化成数组
       this.dynamicsParams = resData.data;
       this.dynamicsParams.forEach((item) => {
