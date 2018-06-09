@@ -44,6 +44,7 @@
         label="操作">
         <template slot-scope="scope">
         <el-button
+            @click="handleShowEditDialog(scope.row)"
             size="mini"
             type="primary"
             icon="el-icon-edit"
@@ -87,11 +88,25 @@
             :props="defaultProps"
             v-model="selectedOptions">
           </el-cascader>
+          <!-- {{ selectedOptions }} -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addDialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改分类的对话框 -->
+    <el-dialog title="修改分类" :visible.sync="editDialogFormVisible">
+      <el-form label-width="100" :model="form" label-position="right">
+        <el-form-item label="分类名称">
+          <el-input style="width: 300px" v-model="form.cat_name" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleUpdata">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -110,9 +125,10 @@ export default {
       loading: true,
       // 控制新增对话框的显示或者隐藏
       addDialogFormVisible: false,
+      editDialogFormVisible: false,
       form: {
         cat_pid: -1,
-        cate_name: '',
+        cat_name: '',
         cat_level: 0
       },
       // 绑定层级下拉框
@@ -131,15 +147,32 @@ export default {
     this.loadData();
   },
   methods: {
+    // 修改分类
+    async handleUpdata() {
+      const { data: resData } = await this.$http.put(`categories/${this.form.cat_id}`, {
+        cat_name: this.form.cat_name
+      });
+      if (resData.meta.status === 200) {
+        this.$message.success(resData.meta.msg);
+        this.loadData();
+        this.editDialogFormVisible = false;
+      }
+    },
+    // 修改分类展示
+    async handleShowEditDialog(cate) {
+      this.editDialogFormVisible = true;
+      this.form.cat_name = cate.cat_name;
+      this.form.cat_id = cate.cat_id;
+    },
     // 删除分类
-    async handleDel(id) {
+    async handleDel(cateID) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
         center: true
       }).then(async () => {
-        const { data: resData } = await this.$http.delete(`categories/${id}`);
+        const { data: resData } = await this.$http.delete(`categories/${cateID}`);
         // console.log(resData);
         if (resData.meta.status === 200) {
           this.$message.success(resData.meta.msg);
