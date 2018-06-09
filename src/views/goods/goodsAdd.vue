@@ -69,7 +69,14 @@
                 </el-checkbox-group>
               </el-form-item>
             </el-tab-pane>
-            <el-tab-pane name="2" label="商品属性">商品属性</el-tab-pane>
+            <el-tab-pane name="2" label="商品属性">
+              <el-form-item
+                v-for="item in staticParams"
+                :key="item.attr_id"
+                :label="item.attr_name">
+                <el-input v-model="item.attr_vals"></el-input>
+              </el-form-item>
+            </el-tab-pane>
             <el-tab-pane name="3" label="商品图片">商品图片</el-tab-pane>
             <el-tab-pane name="4" label="商品内容">商品内容</el-tab-pane>
         </el-tabs>
@@ -116,14 +123,21 @@ export default {
           return;
         }
       }
+      // 根据当前tab栏是商品参数 sel=many 如果是商品属性sel=only
+      const sel = this.active === '1' ? 'many' : 'only';
       // 如果选择了三级分类，发送请求获取数据
       // 请求的接口地址中的id，是三级分类的id
-      const { data: resData } = await this.$http.get(`categories/${this.selectedOptions[2]}/attributes?sel=many`);
-      // 获取动态数据库，需要对数据进行处理，要把分割的数据转化成数组
-      this.dynamicsParams = resData.data;
-      this.dynamicsParams.forEach((item) => {
-        item.attr_vals = item.attr_vals.trim().length === 0 ? [] : item.attr_vals.trim().split(',');
-      });
+      const { data: resData } = await this.$http.get(`categories/${this.selectedOptions[2]}/attributes?sel=${sel}`);
+      if (this.active === '1') {
+        // 获取动态数据库，需要对数据进行处理，要把分割的数据转化成数组
+        this.dynamicsParams = resData.data;
+        this.dynamicsParams.forEach((item) => {
+          item.attr_vals = item.attr_vals.trim().length === 0 ? [] : item.attr_vals.trim().split(',');
+        });
+      } else {
+        // 静态参数赋值
+        this.staticParams = resData.data;
+      }
     },
     handleChange() {
       // 判断当前是否选中的是三级分类
