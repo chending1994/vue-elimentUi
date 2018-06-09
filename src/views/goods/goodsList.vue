@@ -11,12 +11,13 @@
                   clearable>
                   <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
-                <el-button type="success" plain>添加用户</el-button>
+                <el-button @click="$router.push({name: 'goodsadd'})" type="success" plain>添加商品</el-button>
             </div>
           </el-col>
       </el-row>
       <!-- 表格 -->
       <el-table
+        height="500"
         v-loading="loading"
         stripe
         border
@@ -75,6 +76,19 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
     </el-pagination>
+
+    <!-- 添加商品对话框 -->
+    <el-dialog title="添加商品分类" :visible.sync="addDialogFormVisible">
+      <el-form label-width="100" label-position="right">
+        <el-form-item label="分类名称">
+          <el-input style="width: 300px" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button>取 消</el-button>
+        <el-button type="primary">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -86,7 +100,8 @@ export default {
       tableData: [],
       pagenum: 1,
       total: 0,
-      pagesize: 50
+      pagesize: 50,
+      addDialogFormVisible: false
     };
   },
   created() {
@@ -95,10 +110,12 @@ export default {
   methods: {
     // 获取列表数据
     async loadData() {
+      this.loading = true;
       const { data: resData } = await this.$http.get(`goods?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
-      console.log(resData);
+      // console.log(resData);
       this.tableData = resData.data.goods;
       this.total = resData.data.total;
+      this.loading = false;
     },
     handleSizeChange(val) {
       this.pagesize = val;
@@ -108,6 +125,9 @@ export default {
     handleCurrentChange(val) {
       this.pagenum = val;
       this.loadData();
+    },
+    handleAdd() {
+      this.addDialogFormVisible = true;
     }
   }
 };

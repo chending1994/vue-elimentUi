@@ -16,6 +16,9 @@ import Categories from '@/views/goods/categories';
 // 商品列表组件
 import Goods from '@/views/goods/goodsList';
 
+// 商品添加组件
+import GoodsAdd from '@/views/goods/goodsAdd';
+
 // 导入element-ui中的Message方法
 import { Message } from 'element-ui';
 Vue.use(Router);
@@ -52,6 +55,11 @@ const router = new Router({
           name: 'goods',
           path: 'goods',
           component: Goods
+        },
+        {
+          name: 'goodsadd',
+          path: 'goods/add',
+          component: GoodsAdd
         }
       ]
     }
