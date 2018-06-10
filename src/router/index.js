@@ -25,6 +25,9 @@ import { Message } from 'element-ui';
 // 商品参数组件
 import Params from '@/views/goods/params';
 
+// 订单列表
+import Orders from '@/views/orders/orders';
+
 Vue.use(Router);
 
 const router = new Router({
@@ -69,6 +72,11 @@ const router = new Router({
           name: 'params',
           path: 'params',
           component: Params
+        },
+        {
+          name: 'orders',
+          path: 'orders',
+          component: Orders
         }
       ]
     }
