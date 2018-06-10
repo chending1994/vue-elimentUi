@@ -151,8 +151,6 @@ export default {
       this.loading = false;
       if (meta.status === 200) {
         this.tableData = data;
-      } else {
-        this.$message.error(meta.msg);
       }
     },
     // 删除对应的权限
@@ -161,8 +159,6 @@ export default {
       const { data: meta } = resData;
       if (meta.status === 200) {
         this.$message.succes('删除成功');
-      } else {
-        this.$message.error(meta.msg);
       }
     },
     async handleShowSetRightsDialog(role) {
@@ -226,8 +222,6 @@ export default {
         this.setRightsDialogVisible = false;
         // 刷新
         this.loadData();
-      } else {
-        this.$message.error(resData.meta.msg);
       }
     }
   }

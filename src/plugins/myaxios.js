@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { Message } from 'element-ui';
 const myaxios = {};
 myaxios.install = function (Vue) {
   const instance = axios.create({
@@ -19,6 +20,12 @@ myaxios.install = function (Vue) {
   });
 
   instance.interceptors.response.use(function(response) {
+    // 当获取到服务器的响应后，并且再提交给请求动作之前
+    const { data: { meta: { status, msg } } } = response;
+    // 针对不同错误码，可以做出不同的提示
+    if (status !== 200 && status !== 201) {
+      Message.error(msg);
+    }
     return response;
   }, function(error) {
     return Promise.reject(error);

@@ -175,10 +175,10 @@ export default {
     // 添加标签
     async handleInputConfirm(row) {
       if (this.inputValue.length === 0) {
-        return;  
+        return;
       }
       row.params.push(this.inputValue);
-      //清空文本框，显示按钮，隐藏文本框
+      // 清空文本框，显示按钮，隐藏文本框
       this.inputValue = '';
       this.inputVisible = false;
 
@@ -229,14 +229,14 @@ export default {
       // this.activeName ---> many   only
       const { data: { data, meta: { status } } } = await this.$http.get(`categories/${this.selectedOptions[2]}/attributes?sel=${this.activeName}`);
       if (status === 200) {
-        if(this.activeName === 'many') {
+        if (this.activeName === 'many') {
           this.dynamicParams = data;
           // 动态参数的 attr_vals 转换成数组
           // 在动态参数对象上增加一个属性，记录数组  params
           this.dynamicParams.forEach((item) => {
-          const arr = item.attr_vals.trim().split(',').length === 0 ? [] : item.attr_vals.trim().split(',');
-          // 动态给对象，增加的成员，数据绑定会有问题
-          this.$set(item, 'params', arr);
+            const arr = item.attr_vals.trim().split(',').length === 0 ? [] : item.attr_vals.trim().split(',');
+            // 动态给对象，增加的成员，数据绑定会有问题
+            this.$set(item, 'params', arr);
           });
         } else {
           this.staticParams = data;
