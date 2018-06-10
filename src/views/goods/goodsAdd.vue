@@ -88,7 +88,7 @@
               </el-upload>
             </el-tab-pane>
             <el-tab-pane name="4" label="商品内容">
-              <el-button>添加商品</el-button>
+              <el-button @click="handleAdd">添加商品</el-button>
               <quillEditor class="editor" v-model="form.goods_introduce"></quillEditor>
             </el-tab-pane>
         </el-tabs>
@@ -115,7 +115,8 @@ export default {
         goods_weight: '',
         goods_cat: '',
         pics: [],
-        goods_introduce: ''
+        goods_introduce: '',
+        attrs: []
       },
       options: [],
       defaultProps: {
@@ -140,6 +141,28 @@ export default {
     this.loadOptions();
   },
   methods: {
+    // 添加商品
+    async handleAdd() {
+      this.form.goods_cat = this.selectedOptions.join(',');
+      const arr1 = this.dynamicsParams.map((item) => {
+        item.attr_vals = item.attr_vals.join(',');
+        return { attr_id: item.attr_id, attr_value: item.attr_vals };
+      });
+      const arr2 = this.staticParams.map((item) => {
+        return { attr_id: item.attr_id, attr_value: item.attr_vals };
+      });
+
+      // 获取所有选中的分类参数
+      this.form.attrs = [...arr1, ...arr2];
+
+      // 发送请求
+      const { data: { meta: { status, msg } } } = await this.$http.post('goods', this.form);
+      if (status === 201) {
+        this.$message.success('添加成功');
+      } else {
+        this.$message.error(msg);
+      }
+    },
     // 图片上传事件
     // 移除一个图片
     handleRemove(file) {

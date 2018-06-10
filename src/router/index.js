@@ -21,6 +21,10 @@ import GoodsAdd from '@/views/goods/goodsAdd';
 
 // 导入element-ui中的Message方法
 import { Message } from 'element-ui';
+
+// 商品参数组件
+import Params from '@/views/goods/params';
+
 Vue.use(Router);
 
 const router = new Router({
@@ -60,6 +64,11 @@ const router = new Router({
           name: 'goodsadd',
           path: 'goods/add',
           component: GoodsAdd
+        },
+        {
+          name: 'params',
+          path: 'params',
+          component: Params
         }
       ]
     }
