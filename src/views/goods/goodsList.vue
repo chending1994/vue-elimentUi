@@ -75,7 +75,7 @@
         :page-size="50"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
-    </el-pagination>
+      </el-pagination>
 
     <!-- 添加商品对话框 -->
     <el-dialog title="添加商品分类" :visible.sync="addDialogFormVisible">

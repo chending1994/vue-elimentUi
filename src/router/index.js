@@ -28,6 +28,9 @@ import Params from '@/views/goods/params';
 // 订单列表
 import Orders from '@/views/orders/orders';
 
+// 数据统计
+import Reports from '@/views/reports/reports';
+
 Vue.use(Router);
 
 const router = new Router({
@@ -77,6 +80,11 @@ const router = new Router({
           name: 'orders',
           path: 'orders',
           component: Orders
+        },
+        {
+          name: 'reports',
+          path: 'reports',
+          component: Reports
         }
       ]
     }
