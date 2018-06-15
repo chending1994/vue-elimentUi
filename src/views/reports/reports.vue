@@ -22,7 +22,7 @@ export default {
       const myChart = echarts.init(this.$refs.chart);
       myChart.showLoading();
       const { data: { data } } = await this.$http.get('reports/type/1');
-      console.log(data);
+      //  console.log(data);
       const o = {
         title: {
           text: '堆叠区域图'

@@ -154,7 +154,6 @@ export default {
 
       // 获取所有选中的分类参数
       this.form.attrs = [...arr1, ...arr2];
-
       // 发送请求
       const { data: { meta: { status, msg } } } = await this.$http.post('goods', this.form);
       if (status === 201) {
