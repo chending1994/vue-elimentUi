@@ -1,35 +1,36 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import { Message } from 'element-ui';
+// 路由懒加载
 // 导入登录组件
-import Login from '@/views/login';
+const Login = () => import('@/views/login');
 // 导入home组件
-import Home from '@/views/home';
+const Home = () => import('@/views/home');
 
-import Users from '@/views/users/users';
+const Users = () => import('@/views/users/users');
 
-import Rights from '@/views/roles/rights';
+const Rights = () => import('@/views/roles/rights');
 
-import Roles from '@/views/roles/roles';
+const Roles = () => import('@/views/roles/roles');
 
 // 商品分类组件
-import Categories from '@/views/goods/categories';
+const Categories = () => import('@/views/goods/categories');
 // 商品列表组件
-import Goods from '@/views/goods/goodsList';
+const Goods = () => import('@/views/goods/goodsList');
 
 // 商品添加组件
-import GoodsAdd from '@/views/goods/goodsAdd';
+const GoodsAdd = () => import('@/views/goods/goodsAdd');
 
 // 导入element-ui中的Message方法
-import { Message } from 'element-ui';
 
 // 商品参数组件
-import Params from '@/views/goods/params';
+const Params = () => import('@/views/goods/params');
 
 // 订单列表
-import Orders from '@/views/orders/orders';
+const Orders = () => import('@/views/orders/orders');
 
 // 数据统计
-import Reports from '@/views/reports/reports';
+const Reports = () => import('@/views/reports/reports');
 
 Vue.use(Router);
 
